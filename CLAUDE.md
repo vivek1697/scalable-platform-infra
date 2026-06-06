@@ -4,17 +4,41 @@ Context for future work in this repo.
 
 ## Project
 
-Terraform IaC **demo** that provisions an **auto-scaling ECS Fargate service on AWS**.
+Terraform IaC **demo** that provisions an **auto-scaling ECS Fargate platform on AWS**.
 Layered into core (shared) and app infrastructure, designed to be multi-region ready.
+See `Infra_Diagram/infra_diagram.jpg` for the reference architecture.
 
 ## Current state
 
 This is an early scaffold. As of now the repo contains only:
 
 - `README.md` — one-line project description
+- `Infra_Diagram/infra_diagram.jpg` — target architecture diagram
 - `.gitignore` — standard Terraform ignores (state, `.terraform/`, `*.tfvars`)
 
-There is **no Terraform code yet**. Most future work is building it out from scratch.
+There is **no Terraform code yet**. Most future work is building it out from scratch
+to match the diagram.
+
+## Architecture (from the diagram)
+
+**Edge / frontend**
+- Static React frontend served via **CloudFront + S3**.
+- User requests flow CloudFront → **Application Load Balancer** (public subnets).
+
+**Compute (private subnets, 2 AZ)**
+- **ECS Fargate — web**: scales on ALB request count. Serves API traffic, enqueues heavy jobs.
+- **SQS**: queue for heavy/async jobs (web enqueues, worker consumes).
+- **ECS Fargate — worker**: scales on SQS queue depth. Polls and processes jobs.
+
+**Data**
+- **RDS Proxy** for connection pooling, fronting…
+- **Aurora PostgreSQL**: primary (writes) + read replica (reads).
+
+**Networking**
+- **VPC** spanning **2 AZs**, with public + private subnets.
+- **ALB** and **NAT Gateway + EIP** live in public subnets.
+- **NAT Gateway** gives a **fixed egress IP** so outbound calls to **partner systems**
+  (whitelisted external APIs/DBs) come from a stable address.
 
 ## Target layout
 
@@ -22,16 +46,19 @@ Proposed structure to grow into (not built yet):
 
 ```
 modules/            # reusable building blocks
-  network/          #   VPC, subnets, routing, security groups
+  network/          #   VPC, public/private subnets (2 AZ), NAT + EIP, routing, SGs
+  frontend/         #   CloudFront + S3 for the static React app
   ecs-cluster/      #   ECS cluster + Fargate capacity
-  ecs-service/      #   task def, service, ALB, auto-scaling policies
+  ecs-service/      #   reusable Fargate service (task def, ALB wiring, auto-scaling)
+  queue/            #   SQS queue(s)
+  database/         #   Aurora PostgreSQL + RDS Proxy
 environments/       # per-env, per-region root configs that wire modules together
   dev/
   prod/
 ```
 
-- **Core** = `network` + `ecs-cluster` (shared foundation).
-- **App** = `ecs-service` (the scalable workload).
+- **Core** = `network` + `ecs-cluster` + `database` (shared foundation).
+- **App** = web `ecs-service`, worker `ecs-service`, `queue`, `frontend`.
 - Each `environments/*` directory is its own Terraform root with its own state.
 
 ## Conventions
@@ -41,6 +68,7 @@ environments/       # per-env, per-region root configs that wire modules togethe
 - Use remote state (S3 backend + DynamoDB lock) per environment — never commit state.
 - Keep secrets and env values in `*.tfvars` (already gitignored); don't hardcode them.
 - Tag resources consistently (e.g. `Project`, `Environment`, `ManagedBy = terraform`).
+- Auto-scaling: web scales on ALB request count, worker scales on SQS queue depth.
 
 ## Commands
 
