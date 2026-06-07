@@ -59,7 +59,7 @@ modules/              # reusable building blocks
   frontend/           #   CloudFront + S3 for the static React app
   ecs-cluster/        #   ECS cluster + Fargate capacity providers  [built]
   ecs-service/        #   reusable Fargate service (task def, ALB wiring, auto-scaling)
-  queue/              #   SQS queue(s)
+  queue/              #   SQS jobs queue + dead-letter queue  [built]
 core-infra/           # CORE layer — shared foundation, own state
   dev/                #   provisions network, exports VPC/subnet outputs  [built]
 app/                  # APP layer — application resources, own state

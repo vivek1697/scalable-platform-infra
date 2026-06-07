@@ -14,3 +14,10 @@
 #
 # Build order (DB out of scope for the demo):
 #   ecs-cluster -> queue -> ecs-service (web) -> ecs-service (worker) -> frontend
+
+module "queue" {
+  source = "../../modules/queue"
+
+  project     = var.project
+  environment = var.environment
+}
