@@ -1,6 +1,9 @@
 # macOS
 .DS_Store
 
+# Local env files with credentials (.env.example is committed)
+.env
+
 # Local .terraform directories
 .terraform/
 
