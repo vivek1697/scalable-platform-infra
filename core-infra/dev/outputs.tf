@@ -28,3 +28,18 @@ output "nat_public_ip" {
   description = "Fixed egress IP seen by partner systems."
   value       = module.network.nat_public_ip
 }
+
+output "ecs_cluster_id" {
+  description = "ID of the ECS cluster."
+  value       = module.ecs_cluster.cluster_id
+}
+
+output "ecs_cluster_arn" {
+  description = "ARN of the ECS cluster."
+  value       = module.ecs_cluster.cluster_arn
+}
+
+output "ecs_cluster_name" {
+  description = "Name of the ECS cluster."
+  value       = module.ecs_cluster.cluster_name
+}

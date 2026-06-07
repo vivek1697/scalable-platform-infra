@@ -57,7 +57,7 @@ a bad `apply` in the app layer can never touch the VPC/networking in core-infra.
 modules/              # reusable building blocks
   network/            #   VPC, public/private subnets (2 AZ), NAT + EIP, routing  [built]
   frontend/           #   CloudFront + S3 for the static React app
-  ecs-cluster/        #   ECS cluster + Fargate capacity
+  ecs-cluster/        #   ECS cluster + Fargate capacity providers  [built]
   ecs-service/        #   reusable Fargate service (task def, ALB wiring, auto-scaling)
   queue/              #   SQS queue(s)
 core-infra/           # CORE layer — shared foundation, own state
@@ -66,7 +66,7 @@ app/                  # APP layer — application resources, own state
   dev/                #   reads core-infra outputs via terraform_remote_state
 ```
 
-- **Core** (`core-infra/`) = `network` (+ `ecs-cluster` later). Foundation.
+- **Core** (`core-infra/`) = `network` + `ecs-cluster`. Foundation.
 - **App** (`app/`) = web `ecs-service`, worker `ecs-service`, `queue`, `frontend`.
 - Each layer's `dev/` is a separate Terraform root with its own state. The app
   layer consumes core outputs via `terraform_remote_state` (see `app/dev/data.tf`).
