@@ -19,6 +19,14 @@ This is an early scaffold. As of now the repo contains only:
 There is **no Terraform code yet**. Most future work is building it out from scratch
 to match the diagram.
 
+## Demo scope
+
+This is a demo, so we intentionally keep it lean:
+
+- **No database** is provisioned — Aurora PostgreSQL + RDS Proxy are **out of scope**.
+  Build the compute/queue/network path only; treat data as a future addition.
+- Local state only (see Conventions) for simple create/cleanup.
+
 ## Architecture (from the diagram)
 
 **Edge / frontend**
@@ -30,7 +38,7 @@ to match the diagram.
 - **SQS**: queue for heavy/async jobs (web enqueues, worker consumes).
 - **ECS Fargate — worker**: scales on SQS queue depth. Polls and processes jobs.
 
-**Data**
+**Data** _(out of scope for this demo — see Demo scope below)_
 - **RDS Proxy** for connection pooling, fronting…
 - **Aurora PostgreSQL**: primary (writes) + read replica (reads).
 
@@ -51,7 +59,7 @@ modules/            # reusable building blocks
   ecs-cluster/      #   ECS cluster + Fargate capacity
   ecs-service/      #   reusable Fargate service (task def, ALB wiring, auto-scaling)
   queue/            #   SQS queue(s)
-  database/         #   Aurora PostgreSQL + RDS Proxy
+  database/         #   Aurora PostgreSQL + RDS Proxy (out of scope for demo)
 environments/       # per-env, per-region root configs that wire modules together
   dev/
   prod/
@@ -65,7 +73,10 @@ environments/       # per-env, per-region root configs that wire modules togethe
 
 - Run `terraform fmt` and `terraform validate` before committing.
 - Pin provider and Terraform versions (`required_providers` / `required_version`).
-- Use remote state (S3 backend + DynamoDB lock) per environment — never commit state.
+- **State (demo):** use **local state** — keeps create/destroy simple and cleanup easy.
+  Do **not** configure an S3 backend or DynamoDB lock for the demo. Still include the
+  S3 + DynamoDB backend resources/config in the code but **commented out**, with a note
+  that it's the production-ready setup to enable later. Never commit state files.
 - Keep secrets and env values in `*.tfvars` (already gitignored); don't hardcode them.
 - Tag resources consistently (e.g. `Project`, `Environment`, `ManagedBy = terraform`).
 - Auto-scaling: web scales on ALB request count, worker scales on SQS queue depth.
