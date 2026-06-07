@@ -17,3 +17,13 @@ output "web_alb_dns_name" {
   description = "Public DNS name of the web ALB (CloudFront origin)."
   value       = module.web.alb_dns_name
 }
+
+output "frontend_url" {
+  description = "CloudFront domain users hit for the static site."
+  value       = "https://${module.frontend.distribution_domain_name}"
+}
+
+output "frontend_bucket_name" {
+  description = "S3 bucket to upload the React build to."
+  value       = module.frontend.bucket_name
+}

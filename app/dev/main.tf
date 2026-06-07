@@ -82,3 +82,13 @@ module "worker" {
     JOBS_QUEUE_URL = module.queue.queue_url
   }
 }
+
+# Frontend: CloudFront + S3 static React app. Routes /api/* to the web ALB.
+module "frontend" {
+  source = "../../modules/frontend"
+
+  project     = var.project
+  environment = var.environment
+
+  api_origin_domain_name = module.web.alb_dns_name
+}
