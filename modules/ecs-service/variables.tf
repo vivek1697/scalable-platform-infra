@@ -165,8 +165,19 @@ variable "scaling_sqs_queue_name" {
 
 # --- IAM -------------------------------------------------------------------
 
+variable "attach_task_policy" {
+  description = "Whether to attach task_role_policy_json to the task role. Use a static flag so plan-time count is known even when the policy references not-yet-created resources."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.attach_task_policy || var.task_role_policy_json != null
+    error_message = "task_role_policy_json must be set when attach_task_policy is true."
+  }
+}
+
 variable "task_role_policy_json" {
-  description = "Optional IAM policy document (JSON) attached to the task role for app permissions."
+  description = "IAM policy document (JSON) attached to the task role when attach_task_policy is true."
   type        = string
   default     = null
 }

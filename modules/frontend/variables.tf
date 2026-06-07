@@ -37,8 +37,19 @@ variable "spa_routing" {
   default     = true
 }
 
+variable "enable_api_origin" {
+  description = "Route api_path_pattern to api_origin_domain_name (e.g. the web ALB). A static flag so plan-time count is known even when the ALB DNS name isn't."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !var.enable_api_origin || (var.api_origin_domain_name != null && var.api_origin_domain_name != "")
+    error_message = "api_origin_domain_name must be set when enable_api_origin is true."
+  }
+}
+
 variable "api_origin_domain_name" {
-  description = "Optional API origin (e.g. the web ALB DNS name). When set, /api/* is routed to it. Empty disables the API behavior."
+  description = "API origin domain (e.g. the web ALB DNS name) used when enable_api_origin is true."
   type        = string
   default     = ""
 }

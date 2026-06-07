@@ -16,8 +16,10 @@ resource "aws_iam_role" "task" {
 }
 
 # Optional app permissions (e.g. SQS access), supplied by the caller.
+# Gated on a static bool, not on the policy value, because the policy JSON can
+# reference resources that don't exist at plan time (count must be known).
 resource "aws_iam_role_policy" "task" {
-  count = var.task_role_policy_json == null ? 0 : 1
+  count = var.attach_task_policy ? 1 : 0
 
   name   = "${local.name}-task-policy"
   role   = aws_iam_role.task.id

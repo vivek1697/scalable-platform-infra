@@ -46,6 +46,7 @@ module "web" {
   min_capacity         = 1
   max_capacity         = 4
 
+  attach_task_policy    = true
   task_role_policy_json = data.aws_iam_policy_document.web_queue_access.json
 
   environment_variables = {
@@ -76,6 +77,7 @@ module "worker" {
   min_capacity           = 1
   max_capacity           = 6
 
+  attach_task_policy    = true
   task_role_policy_json = data.aws_iam_policy_document.worker_queue_access.json
 
   environment_variables = {
@@ -90,5 +92,6 @@ module "frontend" {
   project     = var.project
   environment = var.environment
 
+  enable_api_origin      = true
   api_origin_domain_name = module.web.alb_dns_name
 }
