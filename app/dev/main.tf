@@ -42,7 +42,10 @@ module "web" {
 
   enable_load_balancer = true
   scaling_metric       = "alb"
-  scaling_target_value = 50
+  # Aggressive for the demo: low target + short cooldowns so it scales out fast.
+  scaling_target_value = 10
+  scale_out_cooldown   = 60
+  scale_in_cooldown    = 60
   min_capacity         = 1
   max_capacity         = 4
 

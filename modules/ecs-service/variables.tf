@@ -152,6 +152,18 @@ variable "scaling_target_value" {
   default     = 50
 }
 
+variable "scale_out_cooldown" {
+  description = "Seconds to wait after a scale-out before another scale-out. Lower = more aggressive."
+  type        = number
+  default     = 300
+}
+
+variable "scale_in_cooldown" {
+  description = "Seconds to wait after a scale-in before another scale-in."
+  type        = number
+  default     = 300
+}
+
 variable "scaling_sqs_queue_name" {
   description = "SQS queue name to scale on (required when scaling_metric is sqs)."
   type        = string

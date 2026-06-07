@@ -22,7 +22,9 @@ resource "aws_appautoscaling_policy" "alb" {
       resource_label         = local.alb_resource_label
     }
 
-    target_value = var.scaling_target_value
+    target_value       = var.scaling_target_value
+    scale_out_cooldown = var.scale_out_cooldown
+    scale_in_cooldown  = var.scale_in_cooldown
   }
 }
 
@@ -48,6 +50,8 @@ resource "aws_appautoscaling_policy" "sqs" {
       }
     }
 
-    target_value = var.scaling_target_value
+    target_value       = var.scaling_target_value
+    scale_out_cooldown = var.scale_out_cooldown
+    scale_in_cooldown  = var.scale_in_cooldown
   }
 }
