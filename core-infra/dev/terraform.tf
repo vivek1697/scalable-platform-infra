@@ -14,15 +14,15 @@ terraform {
 
   # --- Production-ready remote state (enable later) ---------------------------
   # For a real deployment, replace the local backend above with the S3 backend
-  # below (plus a DynamoDB table for state locking). Left commented out on
-  # purpose so the demo stays simple.
+  # below. Uses S3-native state locking (use_lockfile) and encryption. Left
+  # commented out on purpose so the demo stays simple.
   #
   # backend "s3" {
-  #   bucket         = "scalable-platform-infra-tfstate"
-  #   key            = "environments/dev/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   dynamodb_table = "scalable-platform-infra-tflock"
-  #   encrypt        = true
+  #   bucket       = "scalable-platform-infra-useast1-tf-dev"
+  #   key          = "core-infra/live-dev.tfstate"
+  #   region       = "us-east-1"
+  #   encrypt      = true
+  #   use_lockfile = true
   # }
   # ---------------------------------------------------------------------------
 }

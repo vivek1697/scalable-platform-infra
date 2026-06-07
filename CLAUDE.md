@@ -48,26 +48,37 @@ This is a demo, so we intentionally keep it lean:
 - **NAT Gateway** gives a **fixed egress IP** so outbound calls to **partner systems**
   (whitelisted external APIs/DBs) come from a stable address.
 
-## Target layout
+## Layout
 
-Proposed structure to grow into (not built yet):
+State is split into two independent root configs to **limit blast radius**:
+a bad `apply` in the app layer can never touch the VPC/networking in core-infra.
 
 ```
-modules/            # reusable building blocks
-  network/          #   VPC, public/private subnets (2 AZ), NAT + EIP, routing, SGs
-  frontend/         #   CloudFront + S3 for the static React app
-  ecs-cluster/      #   ECS cluster + Fargate capacity
-  ecs-service/      #   reusable Fargate service (task def, ALB wiring, auto-scaling)
-  queue/            #   SQS queue(s)
-  database/         #   Aurora PostgreSQL + RDS Proxy (out of scope for demo)
-environments/       # per-env, per-region root configs that wire modules together
-  dev/
-  prod/
+modules/              # reusable building blocks
+  network/            #   VPC, public/private subnets (2 AZ), NAT + EIP, routing  [built]
+  frontend/           #   CloudFront + S3 for the static React app
+  ecs-cluster/        #   ECS cluster + Fargate capacity
+  ecs-service/        #   reusable Fargate service (task def, ALB wiring, auto-scaling)
+  queue/              #   SQS queue(s)
+core-infra/           # CORE layer — shared foundation, own state
+  dev/                #   provisions network, exports VPC/subnet outputs  [built]
+app/                  # APP layer — application resources, own state
+  dev/                #   reads core-infra outputs via terraform_remote_state
 ```
 
-- **Core** = `network` + `ecs-cluster` + `database` (shared foundation).
-- **App** = web `ecs-service`, worker `ecs-service`, `queue`, `frontend`.
-- Each `environments/*` directory is its own Terraform root with its own state.
+- **Core** (`core-infra/`) = `network` (+ `ecs-cluster` later). Foundation.
+- **App** (`app/`) = web `ecs-service`, worker `ecs-service`, `queue`, `frontend`.
+- Each layer's `dev/` is a separate Terraform root with its own state. The app
+  layer consumes core outputs via `terraform_remote_state` (see `app/dev/data.tf`).
+- `database/` module is intentionally omitted (DB out of scope — see Demo scope).
+
+## File conventions (per .claude/rules/infrastructure)
+
+- `terraform.tf` — backend + `required_providers` + `required_version`
+- `provider.tf` — provider config (root/live layer only; never inside modules)
+- `variables.tf` / `outputs.tf` / `locals.tf` (ALL locals here) / `data.tf` (remote state)
+- Modules: one resource type per file (`vpc.tf`, `subnets.tf`, `gateways.tf`, `routes.tf`)
+- Add `validation {}` blocks on constrained variables; tag via provider `default_tags`.
 
 ## Conventions
 
