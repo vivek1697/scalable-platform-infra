@@ -58,7 +58,7 @@ modules/              # reusable building blocks
   network/            #   VPC, public/private subnets (2 AZ), NAT + EIP, routing  [built]
   frontend/           #   CloudFront + S3 for the static React app
   ecs-cluster/        #   ECS cluster + Fargate capacity providers  [built]
-  ecs-service/        #   reusable Fargate service (task def, ALB wiring, auto-scaling)
+  ecs-service/        #   reusable Fargate service (task def, ALB, IAM, logs, auto-scaling)  [built]
   queue/              #   SQS jobs queue + dead-letter queue  [built]
 core-infra/           # CORE layer — shared foundation, own state
   dev/                #   provisions network, exports VPC/subnet outputs  [built]

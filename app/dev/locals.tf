@@ -5,4 +5,7 @@ locals {
   vpc_cidr_block     = data.terraform_remote_state.core.outputs.vpc_cidr_block
   public_subnet_ids  = data.terraform_remote_state.core.outputs.public_subnet_ids
   private_subnet_ids = data.terraform_remote_state.core.outputs.private_subnet_ids
+
+  ecs_cluster_arn  = data.terraform_remote_state.core.outputs.ecs_cluster_arn
+  ecs_cluster_name = data.terraform_remote_state.core.outputs.ecs_cluster_name
 }

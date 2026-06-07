@@ -12,3 +12,8 @@ output "dlq_url" {
   description = "URL of the dead-letter queue."
   value       = module.queue.dlq_url
 }
+
+output "web_alb_dns_name" {
+  description = "Public DNS name of the web ALB (CloudFront origin)."
+  value       = module.web.alb_dns_name
+}

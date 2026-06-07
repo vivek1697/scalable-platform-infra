@@ -8,3 +8,26 @@ data "terraform_remote_state" "core" {
     path = "${path.module}/../../core-infra/dev/terraform.tfstate"
   }
 }
+
+# Web task role: enqueue jobs onto the SQS queue.
+data "aws_iam_policy_document" "web_queue_access" {
+  statement {
+    sid       = "EnqueueJobs"
+    actions   = ["sqs:SendMessage", "sqs:GetQueueUrl", "sqs:GetQueueAttributes"]
+    resources = [module.queue.queue_arn]
+  }
+}
+
+# Worker task role: consume and delete jobs from the SQS queue.
+data "aws_iam_policy_document" "worker_queue_access" {
+  statement {
+    sid = "ConsumeJobs"
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ChangeMessageVisibility",
+    ]
+    resources = [module.queue.queue_arn]
+  }
+}
